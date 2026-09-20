@@ -15,7 +15,7 @@ permissions:
   contents: write
 
 jobs:
-  release:
+  build:
     name: Build ${{ matrix.name }}
     runs-on: ${{ matrix.os }}
     strategy:
@@ -29,11 +29,13 @@ jobs:
           - name: Windows
             os: windows-latest
           - name: Linux
-            os: ubuntu-22.04
+            os: ubuntu-24.04
 
     steps:
-      - name: Checkout
+      - name: Checkout release ref
         uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag || github.ref }}
 
       - name: Install Linux dependencies
         if: runner.os == 'Linux'
@@ -65,13 +67,61 @@ jobs:
       - name: Check frontend
         run: npm run check
 
-      - name: Build and publish Tauri bundle
-        uses: tauri-apps/tauri-action@v0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build Tauri bundle
+        run: npm run tauri:build
+
+      - name: Collect macOS installers
+        if: runner.os == 'macOS'
+        shell: bash
+        run: |
+          mkdir -p release-assets
+          find src-tauri/target/release/bundle -type f \( -name '*.dmg' -o -name '*.app.tar.gz' \) -exec cp {} release-assets/ \;
+
+      - name: Collect Windows installers
+        if: runner.os == 'Windows'
+        shell: bash
+        run: |
+          mkdir -p release-assets
+          find src-tauri/target/release/bundle -type f \( -name '*.exe' -o -name '*.msi' \) -exec cp {} release-assets/ \;
+
+      - name: Collect Linux installers
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          mkdir -p release-assets
+          find src-tauri/target/release/bundle -type f \( -name '*.deb' -o -name '*.AppImage' -o -name '*.rpm' \) -exec cp {} release-assets/ \;
+
+      - name: Upload installers
+        uses: actions/upload-artifact@v4
         with:
-          tagName: ${{ inputs.tag || github.ref_name }}
-          releaseName: Screenshot2PDF ${{ inputs.tag || github.ref_name }}
-          releaseBody: See CHANGELOG.md for the changes included in this release.
-          releaseDraft: false
+          name: installers-${{ matrix.os }}
+          path: release-assets/*
+          if-no-files-found: error
+
+  publish:
+    name: Publish GitHub release
+    needs: build
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout release ref
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag || github.ref }}
+
+      - name: Download installers
+        uses: actions/download-artifact@v4
+        with:
+          pattern: installers-*
+          path: release-assets
+          merge-multiple: true
+
+      - name: Publish release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ inputs.tag || github.ref_name }}
+          name: Screenshot2PDF ${{ inputs.tag || github.ref_name }}
+          body_path: CHANGELOG.md
+          files: release-assets/*
+          fail_on_unmatched_files: true
+          draft: false
           prerelease: false

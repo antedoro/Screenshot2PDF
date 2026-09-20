@@ -2,6 +2,24 @@
 
 Tutte le modifiche rilevanti a Screenshot2PDF sono documentate in questo file.
 
+
+
+## [0.1.3] - 2026-09-20
+
+### Aggiunto
+
+- Workflow GitHub Actions per build multipiattaforma.
+- CI automatica per push e pull request.
+- Script per sincronizzare la versione del progetto.
+- Documentazione aggiornata per sviluppo e pubblicazione.
+
+### Migliorato
+
+- Rimossa la dipendenza dai Google Fonts remoti.
+- Migliorato il processo di release per evitare conflitti tra job.
+
+
+
 ## [0.1.1] - 2026-09-20
 
 ### Corretto

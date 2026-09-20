@@ -1,158 +1,100 @@
 # Screenshot2PDF
 
-## Avvio web locale
+Applicazione Svelte + TypeScript per trasformare screenshot musicali in un PDF A4 verticale. Funziona nel browser locale e come app desktop macOS tramite Tauri.
 
-Da Terminale:
+## Sviluppo web
 
 ```bash
-cd /Users/antedoro/Desktop/Screenshot2PDF
 ./start-web.sh
 ```
 
-Lo script avvia il server Vite e apre automaticamente l'app nel browser. Per fermarla, premi `Ctrl+C` nel Terminale.
-
-Se macOS blocca l'esecuzione perché lo script non è ancora eseguibile, esegui una volta:
+Lo script installa le dipendenze se necessario, avvia Vite e apre il browser. In alternativa:
 
 ```bash
-chmod +x /Users/antedoro/Desktop/Screenshot2PDF/start-web.sh
+npm install
+npm run dev
 ```
 
-## Sviluppo
-
-## Avvio come app macOS con Tauri
-
-Per avviare la versione desktop in modalità sviluppo:
+## Sviluppo desktop
 
 ```bash
-cd /Users/antedoro/Desktop/Screenshot2PDF
 npm run tauri:dev
 ```
 
-Tauri avvia automaticamente Vite e apre una finestra desktop con l'app.
-
-Per creare il pacchetto macOS:
-
-```bash
-npm run tauri:build
-```
-
-In alternativa puoi usare lo script:
+## Build locale macOS
 
 ```bash
 ./build-tauri.sh
 ```
 
-Lo script controlla il frontend e genera automaticamente l'app `.app` e il file `.dmg`.
-
-## Pubblicazione su GitHub
-
-Per pubblicare il codice già modificato sul repository GitHub:
-
-```bash
-./publish-github.sh
-```
-
-Per creare anche una release GitHub con il tag corrispondente alla versione indicata in `package.json` e allegare il DMG:
-
-```bash
-./publish-github.sh "Descrizione della modifica" --release
-```
-
-Lo script esegue il commit delle modifiche, fa push su `main`, crea il tag e pubblica la release solo se non esistono già.
-
-## Build automatica per macOS, Windows e Linux
-
-Il workflow [release.yml](./.github/workflows/release.yml) crea automaticamente i pacchetti per:
-
-- macOS Apple Silicon (`.dmg`);
-- macOS Intel (`.dmg`);
-- Windows (`.exe` e/o `.msi`);
-- Linux (`.deb` e `.AppImage`).
-
-### Pubblicare una release multipiattaforma
-
-1. Aggiorna la versione in `package.json`, `src-tauri/tauri.conf.json`, `src-tauri/Cargo.toml`, `src-tauri/Cargo.lock` e nell'interfaccia.
-2. Aggiungi la nuova versione in `CHANGELOG.md`.
-3. Crea e invia il commit:
-
-```bash
-git add .
-git commit -m "Release v0.1.2"
-git push origin main
-```
-
-4. Crea e invia il tag:
-
-```bash
-git tag -a v0.1.2 -m "Screenshot2PDF v0.1.2"
-git push origin v0.1.2
-```
-
-Il push del tag avvia GitHub Actions. Al termine, la release GitHub contiene gli installer per tutte le piattaforme.
-
-È possibile avviare il workflow anche manualmente da GitHub inserendo il tag della release:
-
-`Actions` → `Build and release` → `Run workflow`.
-
-L'azione usa automaticamente `GITHUB_TOKEN`: non è necessario creare altri secret per pubblicare gli asset della release.
-
-Lo script di pubblicazione supporta lo stesso flusso:
-
-```bash
-./publish-github.sh "Release v0.1.2" --release
-```
-
-Il comando crea il commit, invia `main`, crea il tag e lascia a GitHub Actions la compilazione e la pubblicazione multipiattaforma.
-
-Per una build locale macOS, i file `.app` e `.dmg` vengono generati nella cartella:
+I bundle vengono creati in:
 
 ```text
 src-tauri/target/release/bundle/macos/
 src-tauri/target/release/bundle/dmg/
 ```
 
-This template should help get you started developing with Svelte and TypeScript in Vite.
+## Funzionalità
 
-## Recommended IDE Setup
+- Importazione di cartelle e immagini PNG, JPG/JPEG e WEBP;
+- drag & drop web e nativo Tauri;
+- ricerca ricorsiva nelle sottocartelle;
+- riordinamento manuale delle immagini;
+- titolo e autore;
+- anteprima A4 in tempo reale;
+- margini e spazio configurabili;
+- esportazione PDF con immagini JPEG ottimizzate;
+- dialog nativo “Salva con nome” su macOS;
+- numero pagina e nome file `Titolo - Autore.pdf`.
 
-[VS Code](https://code.visualstudio.com/) + [Svelte](https://marketplace.visualstudio.com/items?itemName=svelte.svelte-vscode).
+## Versione
 
-## Need an official Svelte framework?
+Per aggiornare in modo coerente tutti i file di versione:
 
-Check out [SvelteKit](https://github.com/sveltejs/kit#readme), which is also powered by Vite. Deploy anywhere with its serverless-first approach and adapt to various platforms, with out of the box support for TypeScript, SCSS, and Less, and easily-added support for mdsvex, GraphQL, PostCSS, Tailwind CSS, and more.
-
-## Technical considerations
-
-**Why use this over SvelteKit?**
-
-- It brings its own routing solution which might not be preferable for some users.
-- It is first and foremost a framework that just happens to use Vite under the hood, not a Vite app.
-
-This template contains as little as possible to get started with Vite + TypeScript + Svelte, while taking into account the developer experience with regards to HMR and intellisense. It demonstrates capabilities on par with the other `create-vite` templates and is a good starting point for beginners dipping their toes into a Vite + Svelte project.
-
-Should you later need the extended capabilities and extensibility provided by SvelteKit, the template has been structured similarly to SvelteKit so that it is easy to migrate.
-
-**Why `global.d.ts` instead of `compilerOptions.types` inside `jsconfig.json` or `tsconfig.json`?**
-
-Setting `compilerOptions.types` shuts out all other types not explicitly listed in the configuration. Using triple-slash references keeps the default TypeScript setting of accepting type information from the entire workspace, while also adding `svelte` and `vite/client` type information.
-
-**Why include `.vscode/extensions.json`?**
-
-Other templates indirectly recommend extensions via the README, but this file allows VS Code to prompt the user to install the recommended extension upon opening the project.
-
-**Why enable `allowJs` in the TS template?**
-
-While `allowJs: false` would indeed prevent the use of `.js` files in the project, it does not prevent the use of JavaScript syntax in `.svelte` files. In addition, it would force `checkJs: false`, bringing the worst of both worlds: not being able to guarantee the entire codebase is TypeScript, and also having worse typechecking for the existing JavaScript. In addition, there are valid use cases in which a mixed codebase may be relevant.
-
-**Why is HMR not preserving my local component state?**
-
-HMR state preservation comes with a number of gotchas! It has been disabled by default in both `svelte-hmr` and `@sveltejs/vite-plugin-svelte` due to its often surprising behavior. You can read the details [here](https://github.com/rixo/svelte-hmr#svelte-hmr).
-
-If you have state that's important to retain within a component, consider creating an external store which would not be replaced by HMR.
-
-```ts
-// store.ts
-// An extremely simple external store
-import { writable } from 'svelte/store'
-export default writable(0)
+```bash
+npm run version:set -- 0.1.2
 ```
+
+Lo script aggiorna `package.json`, `package-lock.json`, la configurazione Tauri, Cargo e la versione mostrata nell’interfaccia. Dopo l’aggiornamento, aggiungi una voce in [CHANGELOG.md](./CHANGELOG.md).
+
+## Pubblicazione su GitHub
+
+Per pubblicare solo le modifiche sul branch `main`:
+
+```bash
+./publish-github.sh "Descrizione della modifica"
+```
+
+Per creare anche il tag e avviare la release multipiattaforma:
+
+```bash
+./publish-github.sh "Release v0.1.2" --release
+```
+
+Il tag attiva [release.yml](./.github/workflows/release.yml), che compila e pubblica:
+
+- macOS Apple Silicon;
+- macOS Intel;
+- Windows;
+- Linux.
+
+La release GitHub contiene gli installer generati dai quattro runner. Non sono necessari secret aggiuntivi: la workflow usa `GITHUB_TOKEN`.
+
+È possibile avviare la workflow manualmente da GitHub in `Actions` → `Build and release` → `Run workflow`, inserendo il tag della release.
+
+## CI
+
+La workflow [ci.yml](./.github/workflows/ci.yml) esegue su push e pull request:
+
+```bash
+npm ci
+npm run check
+npm run build
+cargo check --manifest-path src-tauri/Cargo.toml
+```
+
+## Release
+
+La versione attuale è indicata in `package.json` e sincronizzata con Tauri e Cargo. Le modifiche pubblicate sono documentate in [CHANGELOG.md](./CHANGELOG.md).
+
+La firma e la notarizzazione Apple non sono ancora configurate.

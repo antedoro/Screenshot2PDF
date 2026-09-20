@@ -28,7 +28,7 @@ echo "Creo i bundle Tauri macOS..."
 cargo tauri build
 
 APP_PATH="$PROJECT_DIR/src-tauri/target/release/bundle/macos/Screenshot2PDF.app"
-DMG_PATH="$PROJECT_DIR/src-tauri/target/release/bundle/dmg/Screenshot2PDF_0.1.1_aarch64.dmg"
+DMG_PATH="$PROJECT_DIR/src-tauri/target/release/bundle/dmg/Screenshot2PDF_0.1.3_aarch64.dmg"
 
 echo
 echo "Build completata."
