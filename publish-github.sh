@@ -17,7 +17,7 @@ for argument in "$@"; do
       echo "Uso: ./publish-github.sh [messaggio-commit] [--release]"
       echo
       echo "Senza --release: crea il commit (se necessario) e fa push su GitHub."
-      echo "Con --release: crea anche il bundle Tauri, il tag e la release GitHub."
+      echo "Con --release: crea il tag e attiva la GitHub Action multipiattaforma."
       exit 0
       ;;
     *)
@@ -43,7 +43,6 @@ fi
 
 VERSION="$(node -p "require('./package.json').version")"
 TAG="v${VERSION}"
-DMG_PATH="$PROJECT_DIR/src-tauri/target/release/bundle/dmg/Screenshot2PDF_${VERSION}_aarch64.dmg"
 
 if [ -n "$(git status --short)" ]; then
   git add -A
@@ -66,16 +65,5 @@ else
   echo "Il tag $TAG esiste già: non lo ricreo."
 fi
 
-if [ ! -f "$DMG_PATH" ]; then
-  echo "DMG non trovato: eseguo la build Tauri..."
-  ./build-tauri.sh
-fi
-
-if gh release view "$TAG" >/dev/null 2>&1; then
-  echo "La release $TAG esiste già: non la ricreo."
-else
-  gh release create "$TAG" "$DMG_PATH" \
-    --title "Screenshot2PDF $TAG" \
-    --notes-file CHANGELOG.md
-  echo "Release $TAG pubblicata."
-fi
+echo "Tag $TAG pubblicato."
+echo "GitHub Actions creerà la release multipiattaforma automaticamente."

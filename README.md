@@ -60,7 +60,51 @@ Per creare anche una release GitHub con il tag corrispondente alla versione indi
 
 Lo script esegue il commit delle modifiche, fa push su `main`, crea il tag e pubblica la release solo se non esistono già.
 
-Il file `.app` e il `.dmg` vengono generati nella cartella:
+## Build automatica per macOS, Windows e Linux
+
+Il workflow [release.yml](./.github/workflows/release.yml) crea automaticamente i pacchetti per:
+
+- macOS Apple Silicon (`.dmg`);
+- macOS Intel (`.dmg`);
+- Windows (`.exe` e/o `.msi`);
+- Linux (`.deb` e `.AppImage`).
+
+### Pubblicare una release multipiattaforma
+
+1. Aggiorna la versione in `package.json`, `src-tauri/tauri.conf.json`, `src-tauri/Cargo.toml`, `src-tauri/Cargo.lock` e nell'interfaccia.
+2. Aggiungi la nuova versione in `CHANGELOG.md`.
+3. Crea e invia il commit:
+
+```bash
+git add .
+git commit -m "Release v0.1.2"
+git push origin main
+```
+
+4. Crea e invia il tag:
+
+```bash
+git tag -a v0.1.2 -m "Screenshot2PDF v0.1.2"
+git push origin v0.1.2
+```
+
+Il push del tag avvia GitHub Actions. Al termine, la release GitHub contiene gli installer per tutte le piattaforme.
+
+È possibile avviare il workflow anche manualmente da GitHub inserendo il tag della release:
+
+`Actions` → `Build and release` → `Run workflow`.
+
+L'azione usa automaticamente `GITHUB_TOKEN`: non è necessario creare altri secret per pubblicare gli asset della release.
+
+Lo script di pubblicazione supporta lo stesso flusso:
+
+```bash
+./publish-github.sh "Release v0.1.2" --release
+```
+
+Il comando crea il commit, invia `main`, crea il tag e lascia a GitHub Actions la compilazione e la pubblicazione multipiattaforma.
+
+Per una build locale macOS, i file `.app` e `.dmg` vengono generati nella cartella:
 
 ```text
 src-tauri/target/release/bundle/macos/
