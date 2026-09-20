@@ -44,6 +44,22 @@ In alternativa puoi usare lo script:
 
 Lo script controlla il frontend e genera automaticamente l'app `.app` e il file `.dmg`.
 
+## Pubblicazione su GitHub
+
+Per pubblicare il codice già modificato sul repository GitHub:
+
+```bash
+./publish-github.sh
+```
+
+Per creare anche una release GitHub con il tag corrispondente alla versione indicata in `package.json` e allegare il DMG:
+
+```bash
+./publish-github.sh "Descrizione della modifica" --release
+```
+
+Lo script esegue il commit delle modifiche, fa push su `main`, crea il tag e pubblica la release solo se non esistono già.
+
 Il file `.app` e il `.dmg` vengono generati nella cartella:
 
 ```text
