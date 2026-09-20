@@ -2,6 +2,19 @@
 
 Tutte le modifiche rilevanti a Screenshot2PDF sono documentate in questo file.
 
+## [0.1.1] - 2026-09-20
+
+### Corretto
+
+- Esportazione PDF nella versione macOS Tauri.
+- Salvataggio tramite finestra nativa “Salva con nome”.
+- Scrittura del PDF direttamente nel percorso scelto dall’utente.
+
+### Aggiunto
+
+- Plugin Tauri Dialog per la selezione del percorso di esportazione.
+- Permessi Tauri per la scrittura dei file PDF.
+
 ## [0.1.0] - 2026-09-20
 
 ### Aggiunto

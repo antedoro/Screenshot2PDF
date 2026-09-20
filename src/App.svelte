@@ -201,9 +201,32 @@
     const safeTitle = (title.trim() || 'screenshot').replace(/[^\w\s-]/g, '').replace(/\s+/g, ' ')
     const safeAuthor = author.trim().replace(/[^\w\s-]/g, '').replace(/\s+/g, ' ')
     const filename = `${safeTitle}${safeAuthor ? ` - ${safeAuthor}` : ''}.pdf`
-    pdf.save(filename)
-    isExporting = false
-    status = `PDF esportato: ${filename}`
+
+    try {
+      if ('__TAURI_INTERNALS__' in window) {
+        const { save } = await import('@tauri-apps/plugin-dialog')
+        const { writeFile } = await import('@tauri-apps/plugin-fs')
+        const path = await save({
+          defaultPath: filename,
+          filters: [{ name: 'PDF', extensions: ['pdf'] }],
+        })
+
+        if (!path) {
+          status = 'Esportazione annullata'
+          return
+        }
+
+        await writeFile(path, new Uint8Array(pdf.output('arraybuffer')))
+      } else {
+        pdf.save(filename)
+      }
+      status = `PDF esportato: ${filename}`
+    } catch (error) {
+      console.error('Esportazione PDF non riuscita', error)
+      status = 'Esportazione PDF non riuscita'
+    } finally {
+      isExporting = false
+    }
   }
 
   function fileToJpegDataUrl(file: File): Promise<string> {
@@ -233,7 +256,7 @@
 </script>
 
 <svelte:head>
-  <title>Screenshot2PDF v0.1.0</title>
+  <title>Screenshot2PDF v0.1.1</title>
   <meta name="description" content="Impagina screenshot musicali in un PDF A4" />
 </svelte:head>
 
@@ -242,7 +265,7 @@
     <div class="brand">
       <p class="eyebrow">SCREENSHOT TO PDF</p>
       <div class="brand-title">
-        <h1># Screenshot<span>2</span>PDF <small>v0.1.0</small></h1>
+        <h1># Screenshot<span>2</span>PDF <small>v0.1.1</small></h1>
         <button class="about-button" aria-label="Informazioni su Screenshot2PDF" title="Informazioni su Screenshot2PDF" onclick={() => (aboutOpen = true)}>i</button>
       </div>
     </div>
@@ -379,7 +402,7 @@
       <button class="about-close" aria-label="Chiudi informazioni" onclick={() => (aboutOpen = false)}>×</button>
       <img class="about-icon" src="/screenshot2pdf-icon.svg" alt="Icona Screenshot2PDF" />
       <h2 id="about-title">Screenshot2PDF</h2>
-      <p class="about-version">Versione 0.1.0</p>
+      <p class="about-version">Versione 0.1.1</p>
       <p class="about-author">Developed by V.Antedoro</p>
       <button class="about-ok" onclick={() => (aboutOpen = false)}>OK</button>
     </div>
