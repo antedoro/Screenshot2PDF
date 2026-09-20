@@ -3,7 +3,6 @@
 Tutte le modifiche rilevanti a Screenshot2PDF sono documentate in questo file.
 
 
-
 ## [0.1.3] - 2026-09-20
 
 ### Aggiunto
